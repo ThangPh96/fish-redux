@@ -21,3 +21,6 @@ android/local.properties
 
 # docs
 node_modules/
+
+# FVM Version Cache
+.fvm/
