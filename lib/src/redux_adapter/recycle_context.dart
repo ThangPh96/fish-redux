@@ -40,7 +40,8 @@ class RecycleContext<T> extends AdapterContext<T> {
     _usedIndexMap.clear();
   }
 
-  ContextSys<Object?> reuseOrCreate(Object key, Get<ContextSys<Object?>> create) {
+  ContextSys<Object?> reuseOrCreate(
+      Object key, Get<ContextSys<Object?>> create) {
     final int length = _usedIndexMap[key] = (_usedIndexMap[key] ?? 0) + 1;
     final List<ContextSys<Object?>> list =
         _cachedMap[key] ??= <ContextSys<Object>>[];
@@ -80,7 +81,6 @@ mixin RecycleContextMixin<T> implements AbstractAdapter<T> {
     required DispatchBus bus,
     required Enhancer<Object> enhancer,
   }) {
-    assert(bus != null && enhancer != null);
     return RecycleContext<T>(
       logic: this,
       store: store,
@@ -94,7 +94,7 @@ mixin RecycleContextMixin<T> implements AbstractAdapter<T> {
 
 ListAdapter combineListAdapters(Iterable<ListAdapter> adapters) {
   final List<ListAdapter> list = adapters
-      .where((ListAdapter e) => e != null && e.itemCount > 0)
+      .where((ListAdapter e) => e.itemCount > 0)
       .toList(growable: false);
 
   if (list.every((ListAdapter e) => e.itemCount == 1)) {

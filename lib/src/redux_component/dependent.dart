@@ -10,8 +10,7 @@ class _Dependent<T, P> implements Dependent<T> {
   _Dependent({
     required this.logic,
     required this.connector,
-  })  : assert(logic != null),
-        assert(connector != null);
+  });
 
   @override
   SubReducer<T>? createSubReducer() {
@@ -26,7 +25,6 @@ class _Dependent<T, P> implements Dependent<T> {
     required DispatchBus bus,
     required Enhancer<Object?> enhancer,
   }) {
-    assert(bus != null && enhancer != null);
     assert(isComponent(), 'Unexpected type of ${logic.runtimeType}.');
     final AbstractComponent<P> component = logic as AbstractComponent<P>;
     return component.buildComponent(
@@ -55,7 +53,6 @@ class _Dependent<T, P> implements Dependent<T> {
     required DispatchBus bus,
     required Enhancer<Object?> enhancer,
   }) {
-    assert(bus != null && enhancer != null);
     return logic.createContext(
       store,
       buildContext,
@@ -74,4 +71,4 @@ class _Dependent<T, P> implements Dependent<T> {
 
 Dependent<K> createDependent<K, T>(
         AbstractConnector<K, T> connector, AbstractLogic<T> logic) =>
-    logic != null ? _Dependent<K, T>(connector: connector, logic: logic) : null;
+    _Dependent<K, T>(connector: connector, logic: logic);

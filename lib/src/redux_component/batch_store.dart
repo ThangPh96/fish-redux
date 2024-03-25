@@ -18,7 +18,6 @@ mixin _BatchNotify<T> on Store<T> {
       super.subscribe!(_batch);
 
       subscribe = (void Function() callback) {
-        assert(callback != null);
         _listeners.add(callback);
         return () {
           _listeners.remove(callback);
@@ -28,8 +27,7 @@ mixin _BatchNotify<T> on Store<T> {
   }
 
   bool isInSuitablePhase() {
-    return SchedulerBinding.instance != null &&
-        SchedulerBinding.instance.schedulerPhase !=
+    return SchedulerBinding.instance.schedulerPhase !=
             SchedulerPhase.persistentCallbacks &&
         !(SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle &&
             WidgetsBinding.instance.renderViewElement == null);
@@ -64,7 +62,7 @@ mixin _BatchNotify<T> on Store<T> {
 }
 
 class _BatchStore<T> extends Store<T> with _BatchNotify<T> {
-  _BatchStore(Store<T> store) : assert(store != null) {
+  _BatchStore(Store<T> store) {
     getState = store.getState;
     subscribe = store.subscribe;
     replaceReducer = store.replaceReducer;
@@ -97,7 +95,9 @@ enum _UpdateState { Assign }
 Reducer<T?> _appendUpdateStateReducer<T>(Reducer<T?>? reducer) =>
     (T? state, Action action) => action.type == _UpdateState.Assign
         ? action.payload
-        : reducer == null ? state : reducer(state, action);
+        : reducer == null
+            ? state
+            : reducer(state, action);
 
 Store<T> connectStores<T, K>(
   Store<T> mainStore,
@@ -119,7 +119,7 @@ Store<T> connectStores<T, K>(
 
   final Future<dynamic> Function()? superMainTD = mainStore.teardown;
   mainStore.teardown = () {
-    unsubscribe?.call();
+    unsubscribe.call();
     return superMainTD!();
   };
 

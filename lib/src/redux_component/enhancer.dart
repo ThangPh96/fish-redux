@@ -85,7 +85,7 @@ class EnhancerDefault<T> implements Enhancer<T> {
     AbstractComponent<K> component,
     Store<T>? store,
   ) =>
-      _viewEnhancer?.call(component, store)?.call(_inverterView<K>(view)) ??
+      _viewEnhancer?.call(component, store).call(_inverterView<K>(view)) ??
       view;
 
   @override
@@ -96,7 +96,7 @@ class EnhancerDefault<T> implements Enhancer<T> {
   ) =>
       _adapterEnhancer
           ?.call(logic, store)
-          ?.call(_inverterAdapter<K>(adapterBuilder)) ??
+          .call(_inverterAdapter<K>(adapterBuilder)) ??
       adapterBuilder;
 
   @override
@@ -105,7 +105,7 @@ class EnhancerDefault<T> implements Enhancer<T> {
     AbstractLogic<K> logic,
     Store<T> store,
   ) =>
-      _effectEnhancer?.call(logic, store)?.call(_inverterEffect<K>(effect)) ??
+      _effectEnhancer?.call(logic, store).call(_inverterEffect<K>(effect)) ??
       effect;
 
   @override
@@ -114,16 +114,14 @@ class EnhancerDefault<T> implements Enhancer<T> {
 
   Effect<dynamic>? _inverterEffect<K>(Effect<K>? effect) => effect == null
       ? null
-      : (Action action, Context<dynamic> ctx) => effect(action, ctx as Context<K>);
+      : (Action action, Context<dynamic> ctx) =>
+          effect(action, ctx as Context<K>);
 
-  ViewBuilder<dynamic> _inverterView<K>(ViewBuilder<K> view) => view == null
-      ? null
-      : (dynamic state, Dispatch dispatch, ViewService? viewService) =>
+  ViewBuilder<dynamic> _inverterView<K>(ViewBuilder<K> view) =>
+      (dynamic state, Dispatch dispatch, ViewService? viewService) =>
           view(state, dispatch, viewService);
 
   AdapterBuilder<dynamic> _inverterAdapter<K>(AdapterBuilder<K> adapter) =>
-      adapter == null
-          ? null
-          : (dynamic state, Dispatch dispatch, ViewService? viewService) =>
-              adapter(state, dispatch, viewService);
+      (dynamic state, Dispatch dispatch, ViewService? viewService) =>
+          adapter(state, dispatch, viewService);
 }

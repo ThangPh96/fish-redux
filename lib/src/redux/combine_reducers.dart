@@ -3,9 +3,8 @@ import 'package:collection/collection.dart' show IterableNullableExtension;
 
 /// Combine an iterable of SubReducer<T> into one Reducer<T>
 Reducer<T>? combineSubReducers<T>(Iterable<SubReducer<T>?>? subReducers) {
-  final List<SubReducer<T>?>? notNullReducers = subReducers
-      ?.whereNotNull()
-      .toList(growable: false);
+  final List<SubReducer<T>?>? notNullReducers =
+      subReducers?.whereNotNull().toList(growable: false);
 
   if (notNullReducers == null || notNullReducers.isEmpty) {
     return null;
@@ -52,10 +51,8 @@ Reducer<T>? combineReducers<T>(Iterable<Reducer<T>?>? reducers) {
 
 /// Convert a super Reducer<Sup> to a sub Reducer<Sub>
 Reducer<Sub> castReducer<Sub extends Sup, Sup>(Reducer<Sup> sup) {
-  return sup == null
-      ? null
-      : (Sub state, Action action) {
-          final Sub result = sup(state, action) as Sub;
-          return result;
-        };
+  return (Sub state, Action action) {
+    final Sub result = sup(state, action) as Sub;
+    return result;
+  };
 }

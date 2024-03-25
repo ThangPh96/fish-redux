@@ -7,7 +7,7 @@ import 'lifecycle.dart';
 
 mixin _ExtraMixin {
   Map<String, Object> _extra;
-  Map<String, Object> get extra => _extra ??= <String, Object>{};
+  Map<String, Object> get extra => _extra;
 }
 
 /// Default Context
@@ -38,12 +38,7 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
     /// pageBus
     required this.bus,
     required this.enhancer,
-  })  : assert(logic != null),
-        assert(store != null),
-        assert(buildContext != null),
-        assert(getState != null),
-        assert(bus != null && enhancer != null),
-        _buildContext = buildContext {
+  }) : _buildContext = buildContext {
     ///
     _effectDispatch = logic.createEffectDispatch(this, enhancer);
 
@@ -78,7 +73,6 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
 
   @override
   Widget buildComponent(String name, {Widget? defaultWidget}) {
-    assert(name != null, 'The name must be NotNull for buildComponent.');
     final Dependent<T?>? dependent = logic.slot(name);
     final Widget? result = dependent?.buildComponent(store, getState,
         bus: bus, enhancer: enhancer);
@@ -159,7 +153,7 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
       ),
     );
 
-    return () => disposable?.dispose();
+    return () => disposable.dispose();
   }
 }
 
@@ -185,8 +179,7 @@ class ComponentContext<T> extends LogicContext<T> implements ViewUpdater<T> {
     required this.sidecarCtx,
     required DispatchBus bus,
     required Enhancer<Object?> enhancer,
-  })  : assert(bus != null && enhancer != null),
-        super(
+  }) : super(
           logic: logic,
           store: store,
           buildContext: buildContext,
@@ -256,7 +249,6 @@ class ComponentContext<T> extends LogicContext<T> implements ViewUpdater<T> {
     try {
       markNeedsBuild();
     } catch (e) {
-      /// TODO
       /// should try-catch in force mode which is called from outside
     }
   }
@@ -274,15 +266,17 @@ class PureViewViewService implements ViewService {
   void broadcast(Action action) => bus!.broadcast(action);
 
   @override
-  void broadcastEffect(Action action, {bool? excluded}) => bus!.dispatch(action);
+  void broadcastEffect(Action action, {bool? excluded}) =>
+      bus!.dispatch(action);
 
   @override
   ListAdapter buildAdapter() => throw Exception(
       'Unexpected call of "buildAdapter" in a PureViewComponent');
 
   @override
-  Widget buildComponent(String name, {Widget? defaultWidget}) => throw Exception(
-      'Unexpected call of "buildComponent" in a PureViewComponent');
+  Widget buildComponent(String name, {Widget? defaultWidget}) =>
+      throw Exception(
+          'Unexpected call of "buildComponent" in a PureViewComponent');
 
   @override
   Map<String, Object?> get extra =>

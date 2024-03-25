@@ -9,7 +9,7 @@ typedef ApplyLikeEnhancer = ApplyLike Function(ApplyLike functor);
 ApplyLike _identity(ApplyLike f) => f;
 
 ApplyLikeEnhancer _combine(ApplyLikeEnhancer e0, ApplyLikeEnhancer e1) =>
-    (ApplyLike f) => (e1 ?? _identity)((e0 ?? _identity)(f));
+    (ApplyLike f) => (e1)((e0)(f));
 
 const ApplyLikeEnhancer ApplyLikeEnhancerIdentity = _identity;
 

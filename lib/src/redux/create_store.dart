@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'basic.dart';
 
-Reducer<T> _noop<T>() => (T state, Action action) => state;
-
 typedef _VoidCallback = void Function();
 
 void _throwIfNot(bool condition, [String? message]) {
@@ -23,14 +21,16 @@ Store<T> _createStore<T>(final T preloadedState, final Reducer<T> reducer) {
       StreamController<T>.broadcast(sync: true);
 
   T _state = preloadedState;
-  Reducer<T> _reducer = reducer ?? _noop<T>();
+  Reducer<T> _reducer = reducer;
   bool _isDispatching = false;
   bool _isDisposed = false;
 
   return Store<T>()
     ..getState = (() => _state)
     ..dispatch = (Action action) {
+      // ignore: unnecessary_null_comparison
       _throwIfNot(action != null, 'Expected the action to be non-null value.');
+      // ignore: unnecessary_null_comparison
       _throwIfNot(action.type != null,
           'Expected the action.type to be non-null value.');
       _throwIfNot(!_isDispatching, 'Reducers may not dispatch actions.');
@@ -56,10 +56,11 @@ Store<T> _createStore<T>(final T preloadedState, final Reducer<T> reducer) {
       _notifyController.add(_state);
     }
     ..replaceReducer = (Reducer<T> replaceReducer) {
-      _reducer = replaceReducer ?? _noop as T Function(T, Action);
+      _reducer = replaceReducer;
     }
     ..subscribe = (_VoidCallback listener) {
       _throwIfNot(
+        // ignore: unnecessary_null_comparison
         listener != null,
         'Expected the listener to be non-null value.',
       );
@@ -94,7 +95,7 @@ Store<T> createStore<T>(T preloadedState, Reducer<T> reducer,
         : _createStore(preloadedState, reducer);
 
 StoreEnhancer<T>? composeStoreEnhancer<T>(List<StoreEnhancer<T>> enhancers) =>
-    enhancers == null || enhancers.isEmpty
+    enhancers.isEmpty
         ? null
         : enhancers.reduce((StoreEnhancer<T> previous, StoreEnhancer<T> next) =>
             (StoreCreator<T> creator) => next(previous(creator)));

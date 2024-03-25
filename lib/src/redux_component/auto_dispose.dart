@@ -30,7 +30,7 @@ class AutoDispose {
     }
 
     /// Cut off the connection with parent.
-    _fields.parent?._fields?.children?.remove(this);
+    _fields.parent?._fields.children?.remove(this);
     _fields.parent = null;
 
     /// The hook function of onDisposed is triggered.
@@ -58,15 +58,13 @@ class AutoDispose {
       return;
     }
 
-    if (newParent != null && newParent.isDisposed) {
+    if (newParent.isDisposed) {
       dispose();
       return;
     }
 
-    if (newParent != null) {
-      newParent._fields.children ??= <AutoDispose>{};
-      newParent._fields.children!.add(this);
-    }
+    newParent._fields.children ??= <AutoDispose>{};
+    newParent._fields.children!.add(this);
     if (oldParent != null) {
       oldParent._fields.children!.remove(this);
     }

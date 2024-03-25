@@ -38,8 +38,7 @@ abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
     /// }
     @deprecated Key Function(T?)? key,
     bool clearOnDependenciesChanged = false,
-  })  : assert(view != null),
-        _view = view,
+  })  : _view = view,
         _wrapper = wrapper ?? _wrapperByDefault,
         _shouldUpdate = shouldUpdate ?? updateByDefault<T?>(),
         _clearOnDependenciesChanged = clearOnDependenciesChanged,
@@ -60,7 +59,7 @@ abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
     required Enhancer<Object?> enhancer,
   }) {
     /// Check bus: DispatchBusDefault(); enhancer: EnhancerDefault<Object>();
-    assert(bus != null && enhancer != null);
+    assert(bus != null);
 
     return protectedWrapper(
       isPureView()
@@ -90,7 +89,6 @@ abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
     required DispatchBus bus,
     required Enhancer<Object?> enhancer,
   }) {
-    assert(bus != null && enhancer != null);
     return ComponentContext<T?>(
       logic: this,
       store: store,
@@ -183,10 +181,7 @@ class ComponentWidget<T> extends StatefulWidget {
     this.bus,
     this.enhancer,
     Key? key,
-  })  : assert(component != null),
-        assert(store != null),
-        assert(getter != null),
-        super(key: key);
+  })  : super(key: key);
 
   @override
   ComponentState<T> createState() => component.createState();

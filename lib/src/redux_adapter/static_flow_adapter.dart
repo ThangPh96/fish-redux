@@ -23,14 +23,13 @@ class StaticFlowAdapter<T> extends Logic<T>
     ///   Object key() => _key;
     /// }
     @deprecated Object Function(T)? key,
-  })  : assert(slots != null),
-        _slots = Collections.compact(slots),
+  })  : _slots = Collections.compact(slots),
         super(
           reducer: combineReducers(<Reducer<T>?>[
             reducer,
             combineSubReducers(
               slots.map(
-                (Dependent<T> dependent) => dependent?.createSubReducer(),
+                (Dependent<T> dependent) => dependent.createSubReducer(),
               ),
             )
           ]),

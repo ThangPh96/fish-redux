@@ -14,7 +14,8 @@ import '../utils/utils.dart';
 mixin VisibleChangeMixin<T> on AbstractAdapter<T> {
   @override
   ListAdapter buildAdapter(ContextSys<T> ctx) {
-    return _wrapVisibleChange<T>(super.buildAdapter(ctx), ctx as LogicContext<T>);
+    return _wrapVisibleChange<T>(
+        super.buildAdapter(ctx), ctx as LogicContext<T>);
   }
 }
 
@@ -56,20 +57,18 @@ ListAdapter _wrapVisibleChange<T>(
   ListAdapter listAdapter,
   LogicContext<T> ctx,
 ) {
-  final _VisibleChangeDispatch onChange =
-      (ctx.extra['\$visible'] ??= _VisibleChangeDispatch(ctx.dispatch)) as _VisibleChangeDispatch;
+  final _VisibleChangeDispatch onChange = (ctx.extra['\$visible'] ??=
+      _VisibleChangeDispatch(ctx.dispatch)) as _VisibleChangeDispatch;
 
-  return listAdapter == null
-      ? null
-      : ListAdapter(
-          (BuildContext buildContext, int index) => _VisibleChangeWidget(
-            itemBuilder: listAdapter.itemBuilder,
-            index: index,
-            dispatch: onChange.onAction,
-            key: ValueKey<Tuple2<Object, int>>(Tuple2<Object, int>(ctx, index)),
-          ),
-          listAdapter.itemCount,
-        );
+  return ListAdapter(
+    (BuildContext buildContext, int index) => _VisibleChangeWidget(
+      itemBuilder: listAdapter.itemBuilder,
+      index: index,
+      dispatch: onChange.onAction,
+      key: ValueKey<Tuple2<Object, int>>(Tuple2<Object, int>(ctx, index)),
+    ),
+    listAdapter.itemCount,
+  );
 }
 
 class _VisibleChangeDispatch extends AutoDispose {

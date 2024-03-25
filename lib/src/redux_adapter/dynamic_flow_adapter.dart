@@ -48,7 +48,6 @@ class DynamicFlowAdapter<T> extends Logic<T> with RecycleContextMixin<T> {
   @override
   ListAdapter buildAdapter(ContextSys<T>? ctx) {
     final List<ItemBean> list = connector.get(ctx!.state);
-    assert(list != null);
 
     final RecycleContext<T> recycleCtx = ctx as RecycleContext<T>;
     final List<ListAdapter> adapters = <ListAdapter>[];
@@ -59,34 +58,30 @@ class DynamicFlowAdapter<T> extends Logic<T> with RecycleContextMixin<T> {
       final ItemBean itemBean = list[index];
       final String type = itemBean.type;
       final AbstractLogic<Object> result = pool[type]!;
-      assert(
-          result != null, 'Type of $type has not benn registered in the pool.');
-      if (result != null) {
-        if (result is AbstractAdapter<Object?>) {
-          final ContextSys<Object?> subCtx = recycleCtx.reuseOrCreate(
-            Tuple2<Type, Object>(
-              result.runtimeType,
-              result.key(itemBean.data),
-            ),
-            () => result.createContext(
-              recycleCtx.store,
-              recycleCtx.context,
-              _subGetter(() => connector.get(recycleCtx.state), index),
-              bus: recycleCtx.bus,
-              enhancer: recycleCtx.enhancer,
-            ),
+      if (result is AbstractAdapter<Object?>) {
+        final ContextSys<Object?> subCtx = recycleCtx.reuseOrCreate(
+          Tuple2<Type, Object>(
+            result.runtimeType,
+            result.key(itemBean.data),
+          ),
+          () => result.createContext(
+            recycleCtx.store,
+            recycleCtx.context,
+            _subGetter(() => connector.get(recycleCtx.state), index),
+            bus: recycleCtx.bus,
+            enhancer: recycleCtx.enhancer,
+          ),
+        );
+        adapters.add(result.buildAdapter(subCtx));
+      } else if (result is AbstractComponent<Object>) {
+        adapters.add(ListAdapter((BuildContext buildContext, int _) {
+          return result.buildComponent(
+            recycleCtx.store,
+            _subGetter(() => connector.get(recycleCtx.state), index),
+            bus: recycleCtx.bus,
+            enhancer: recycleCtx.enhancer,
           );
-          adapters.add(result.buildAdapter(subCtx));
-        } else if (result is AbstractComponent<Object>) {
-          adapters.add(ListAdapter((BuildContext buildContext, int _) {
-            return result.buildComponent(
-              recycleCtx.store,
-              _subGetter(() => connector.get(recycleCtx.state), index),
-              bus: recycleCtx.bus,
-              enhancer: recycleCtx.enhancer,
-            );
-          }, 1));
-        }
+        }, 1));
       }
     }
     recycleCtx.cleanUnused();
@@ -138,7 +133,7 @@ Get<Object> _subGetter(Get<List<ItemBean>> getter, int index) {
     final List<ItemBean> newState = getter();
 
     /// Either all sub-components use cache or not.
-    if (newState != null && newState.length > index) {
+    if (newState.length > index) {
       final ItemBean newItem = newState[index];
       if (_couldReuse(cacheItem, newItem)) {
         cacheItem = newItem;

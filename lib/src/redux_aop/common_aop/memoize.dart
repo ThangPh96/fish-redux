@@ -4,7 +4,7 @@ bool _listEquals<E>(List<E> list1, List<E>? list2) {
   if (identical(list1, list2)) {
     return true;
   }
-  if (list1 == null || list2 == null) {
+  if (list2 == null) {
     return false;
   }
   final int length = list1.length;

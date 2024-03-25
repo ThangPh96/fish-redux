@@ -1,11 +1,6 @@
 import 'package:fish_redux/fish_redux.dart';
 import 'package:flutter/widgets.dart' hide Action, Page;
 
-import '../redux/redux.dart';
-import '../redux_component/redux_component.dart';
-import '../utils/utils.dart';
-import 'recycle_context.dart';
-
 /// Use [AdapterSource] instead of [List<ItemItemBean>]
 abstract class AdapterSource {
   int get itemCount;
@@ -70,7 +65,6 @@ class SourceFlowAdapter<T extends AdapterSource> extends Logic<T>
   @override
   ListAdapter buildAdapter(ContextSys<T>? ctx) {
     final AdapterSource adapterSource = ctx!.state;
-    assert(adapterSource != null);
 
     final RecycleContext<T> recycleCtx = ctx as RecycleContext<T>;
     final List<ListAdapter> adapters = <ListAdapter>[];
@@ -81,34 +75,30 @@ class SourceFlowAdapter<T extends AdapterSource> extends Logic<T>
       final String type = adapterSource.getItemType(index);
       final AbstractLogic<Object> result = pool[type]!;
 
-      assert(
-          result != null, 'Type of $type has not benn registered in the pool.');
-      if (result != null) {
-        if (result is AbstractAdapter<Object?>) {
-          final ContextSys<Object?> subCtx = recycleCtx.reuseOrCreate(
-            Tuple2<Type, Object>(
-              result.runtimeType,
-              result.key(adapterSource.getItemData(index)),
-            ),
-            () => result.createContext(
-              recycleCtx.store,
-              recycleCtx.context,
-              _subGetter(() => recycleCtx.state, index),
-              bus: recycleCtx.bus,
-              enhancer: recycleCtx.enhancer,
-            ),
+      if (result is AbstractAdapter<Object?>) {
+        final ContextSys<Object?> subCtx = recycleCtx.reuseOrCreate(
+          Tuple2<Type, Object>(
+            result.runtimeType,
+            result.key(adapterSource.getItemData(index)),
+          ),
+          () => result.createContext(
+            recycleCtx.store,
+            recycleCtx.context,
+            _subGetter(() => recycleCtx.state, index),
+            bus: recycleCtx.bus,
+            enhancer: recycleCtx.enhancer,
+          ),
+        );
+        adapters.add(result.buildAdapter(subCtx));
+      } else if (result is AbstractComponent<Object>) {
+        adapters.add(ListAdapter((BuildContext buildContext, int _) {
+          return result.buildComponent(
+            recycleCtx.store,
+            _subGetter(() => recycleCtx.state, index),
+            bus: recycleCtx.bus,
+            enhancer: recycleCtx.enhancer,
           );
-          adapters.add(result.buildAdapter(subCtx));
-        } else if (result is AbstractComponent<Object>) {
-          adapters.add(ListAdapter((BuildContext buildContext, int _) {
-            return result.buildComponent(
-              recycleCtx.store,
-              _subGetter(() => recycleCtx.state, index),
-              bus: recycleCtx.bus,
-              enhancer: recycleCtx.enhancer,
-            );
-          }, 1));
-        }
+        }, 1));
       }
     }
     recycleCtx.cleanUnused();
@@ -155,7 +145,7 @@ Get<Object> _subGetter(Get<AdapterSource> getter, int index) {
     final AdapterSource newState = getter();
 
     /// Either all sub-components use cache or not.
-    if (newState != null && newState.itemCount > index) {
+    if (newState.itemCount > index) {
       final String newType = newState.getItemType(index);
       final Object newData = newState.getItemData(index);
 
