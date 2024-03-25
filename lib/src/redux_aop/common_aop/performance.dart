@@ -10,7 +10,7 @@ ApplyLikeEnhancer performanceAOP(String tag) {
   return isDebug()
       ? (dynamic Function(List<dynamic>) functor) {
           return (List<dynamic> positionalArguments,
-              [Map<Symbol, dynamic> namedArguments]) {
+              [Map<Symbol, dynamic>? namedArguments]) {
             final int marked = DateTime.now().microsecondsSinceEpoch;
             final Object result = functor(positionalArguments);
             if (result is Future) {
@@ -18,7 +18,7 @@ ApplyLikeEnhancer performanceAOP(String tag) {
                 print(
                     '$tag performance <Future>: ${_microSecsSinceEpoch() - marked}');
                 return r;
-              });
+              } as FutureOr<_> Function(dynamic));
             } else {
               print('$tag performance: ${_microSecsSinceEpoch() - marked}');
             }

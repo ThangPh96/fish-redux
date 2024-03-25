@@ -5,17 +5,17 @@ import '../redux_component/redux_component.dart';
 import 'adapter.dart';
 
 class RecycleContext<T> extends AdapterContext<T> {
-  final Map<Object, List<ContextSys<Object>>> _cachedMap =
+  final Map<Object, List<ContextSys<Object?>>> _cachedMap =
       <Object, List<ContextSys<Object>>>{};
   final Map<Object, int> _usedIndexMap = <Object, int>{};
 
   RecycleContext({
-    @required AbstractAdapter<T> logic,
-    @required @required Store<Object> store,
-    @required BuildContext buildContext,
-    @required Get<T> getState,
-    @required DispatchBus bus,
-    @required Enhancer<Object> enhancer,
+    required AbstractAdapter<T> logic,
+    @required required Store<Object> store,
+    required BuildContext buildContext,
+    required Get<T> getState,
+    required DispatchBus bus,
+    required Enhancer<Object> enhancer,
   }) : super(
           logic: logic,
           store: store,
@@ -27,8 +27,8 @@ class RecycleContext<T> extends AdapterContext<T> {
 
   @override
   void onLifecycle(Action action) {
-    _cachedMap.forEach((Object key, List<ContextSys<Object>> list) {
-      for (ContextSys<Object> sub in list) {
+    _cachedMap.forEach((Object key, List<ContextSys<Object?>> list) {
+      for (ContextSys<Object?> sub in list) {
         sub.onLifecycle(action);
       }
     });
@@ -40,13 +40,13 @@ class RecycleContext<T> extends AdapterContext<T> {
     _usedIndexMap.clear();
   }
 
-  ContextSys<Object> reuseOrCreate(Object key, Get<ContextSys<Object>> create) {
+  ContextSys<Object?> reuseOrCreate(Object key, Get<ContextSys<Object?>> create) {
     final int length = _usedIndexMap[key] = (_usedIndexMap[key] ?? 0) + 1;
-    final List<ContextSys<Object>> list =
+    final List<ContextSys<Object?>> list =
         _cachedMap[key] ??= <ContextSys<Object>>[];
 
     if (length > list.length) {
-      _cachedMap[key].add(
+      _cachedMap[key]!.add(
         create()
           ..setParent(this)
           ..onLifecycle(LifecycleCreator.initState()),
@@ -57,7 +57,7 @@ class RecycleContext<T> extends AdapterContext<T> {
   }
 
   void cleanUnused() {
-    _cachedMap.removeWhere((Object key, List<ContextSys<Object>> value) {
+    _cachedMap.removeWhere((Object key, List<ContextSys<Object?>> value) {
       final int usedCount = _usedIndexMap[key] ?? 0;
 
       for (int i = usedCount; i < value.length; i++) {
@@ -77,8 +77,8 @@ mixin RecycleContextMixin<T> implements AbstractAdapter<T> {
     Store<Object> store,
     BuildContext buildContext,
     Get<T> getState, {
-    @required DispatchBus bus,
-    @required Enhancer<Object> enhancer,
+    required DispatchBus bus,
+    required Enhancer<Object> enhancer,
   }) {
     assert(bus != null && enhancer != null);
     return RecycleContext<T>(
@@ -101,7 +101,7 @@ ListAdapter combineListAdapters(Iterable<ListAdapter> adapters) {
     /// The result is AbstractComponent
     return ListAdapter(
       (BuildContext buildContext, final int index) =>
-          list[index].itemBuilder(buildContext, 0),
+          list[index].itemBuilder!(buildContext, 0),
       list.length,
     );
   } else if (list.length == 1) {
@@ -123,7 +123,7 @@ ListAdapter combineListAdapters(Iterable<ListAdapter> adapters) {
         xIndex++;
       }
       assert(xIndex < list.length);
-      return list[xIndex].itemBuilder(buildContext, yIndex);
+      return list[xIndex].itemBuilder!(buildContext, yIndex);
     },
     maxItemCount,
   );

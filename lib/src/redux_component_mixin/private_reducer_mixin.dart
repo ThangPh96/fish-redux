@@ -9,8 +9,8 @@ import '../redux_component/redux_component.dart';
 /// }
 mixin PrivateReducerMixin<T> on Logic<T> {
   @override
-  Reducer<T> get protectedReducer {
-    final Reducer<T> superReducer = super.protectedReducer;
+  Reducer<T>? get protectedReducer {
+    final Reducer<T>? superReducer = super.protectedReducer;
     return superReducer != null
         ? (T state, Action action) {
             if (action is PrivateAction && action.target == state) {
@@ -38,7 +38,7 @@ mixin PrivateReducerMixin<T> on Logic<T> {
 }
 
 class PrivateAction extends Action {
-  final Object target;
+  final Object? target;
   PrivateAction(Object type, {dynamic payload, this.target})
       : super(type, payload: payload);
 

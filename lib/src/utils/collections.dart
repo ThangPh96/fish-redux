@@ -1,9 +1,10 @@
 import 'dart:core';
+import 'package:collection/collection.dart' show IterableNullableExtension;
 
 /// Util for collections.
 class Collections {
   /// Wrap List.reduce with a check list is null or empty.
-  static E reduce<E>(List<E> list, E combine(E e0, E e1)) =>
+  static E? reduce<E>(List<E> list, E combine(E e0, E e1)) =>
       (list == null || list.isEmpty) ? null : list.reduce(combine);
 
   /// Wrap List.fold with a check list is null or empty.
@@ -16,7 +17,7 @@ class Collections {
   /// List<String> b = ['1', '2', '3'];
   /// List<List<String>> list = [a, b] // [[a, b, c], [1, 2, 3]]
   /// List<String> listFlatten = Collections.flatten(list) // [a, b, c, 1, 2, 3]
-  static List<E> flatten<E>(List<List<E>> lists) => reduce(lists, merge);
+  static List<E>? flatten<E>(List<List<E>> lists) => reduce(lists, merge);
 
   /// Merge two Iterable
   /// List<String> a = ['a', 'b', 'c'];
@@ -47,8 +48,8 @@ class Collections {
   /// List<String> list = ['1', '2', null, '3', null];
   /// print(list)                       // [1, 2, null, 3, null]
   /// print(Collections.compact(list)); // [1, 2, 3]
-  static List<T> compact<T>(Iterable<T> list, {bool growable = true}) =>
-      list?.where((T e) => e != null)?.toList(growable: growable);
+  static List<T>? compact<T>(Iterable<T>? list, {bool growable = true}) =>
+      list?.whereNotNull().toList(growable: growable);
 
   /// Check if an Object is Empty.
   static bool isEmpty(Object value) {

@@ -11,37 +11,37 @@ import 'logic.dart';
 typedef WidgetWrapper = Widget Function(Widget child);
 
 @immutable
-abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
-  final ViewBuilder<T> _view;
-  final ShouldUpdate<T> _shouldUpdate;
+abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
+  final ViewBuilder<T?> _view;
+  final ShouldUpdate<T?> _shouldUpdate;
   final WidgetWrapper _wrapper;
   final bool _clearOnDependenciesChanged;
 
-  ViewBuilder<T> get protectedView => _view;
-  ShouldUpdate<T> get protectedShouldUpdate => _shouldUpdate;
+  ViewBuilder<T?> get protectedView => _view;
+  ShouldUpdate<T?> get protectedShouldUpdate => _shouldUpdate;
   WidgetWrapper get protectedWrapper => _wrapper;
   bool get protectedClearOnDependenciesChanged => _clearOnDependenciesChanged;
 
   Component({
-    @required ViewBuilder<T> view,
-    Reducer<T> reducer,
-    ReducerFilter<T> filter,
-    Effect<T> effect,
-    Dependencies<T> dependencies,
-    ShouldUpdate<T> shouldUpdate,
-    WidgetWrapper wrapper,
+    required ViewBuilder<T?> view,
+    Reducer<T?>? reducer,
+    ReducerFilter<T?>? filter,
+    Effect<T?>? effect,
+    Dependencies<T>? dependencies,
+    ShouldUpdate<T?>? shouldUpdate,
+    WidgetWrapper? wrapper,
 
     /// implement [StateKey] in T instead of using key in Logic.
     /// class T implements StateKey {
     ///   Object _key = UniqueKey();
     ///   Object key() => _key;
     /// }
-    @deprecated Key Function(T) key,
+    @deprecated Key Function(T?)? key,
     bool clearOnDependenciesChanged = false,
   })  : assert(view != null),
         _view = view,
         _wrapper = wrapper ?? _wrapperByDefault,
-        _shouldUpdate = shouldUpdate ?? updateByDefault<T>(),
+        _shouldUpdate = shouldUpdate ?? updateByDefault<T?>(),
         _clearOnDependenciesChanged = clearOnDependenciesChanged,
         super(
           reducer: reducer,
@@ -54,10 +54,10 @@ abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
 
   @override
   Widget buildComponent(
-    Store<Object> store,
-    Get<Object> getter, {
-    @required DispatchBus bus,
-    @required Enhancer<Object> enhancer,
+    Store<Object?>? store,
+    Get<Object?>? getter, {
+    required DispatchBus? bus,
+    required Enhancer<Object?> enhancer,
   }) {
     /// Check bus: DispatchBusDefault(); enhancer: EnhancerDefault<Object>();
     assert(bus != null && enhancer != null);
@@ -70,11 +70,11 @@ abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
               getter: getter,
               bus: bus,
             )
-          : ComponentWidget<T>(
+          : ComponentWidget<T?>(
               component: this,
               getter: _asGetter<T>(getter),
-              store: store,
-              key: key(getter()),
+              store: store!,
+              key: key(getter!() as T*) as Key?,
               bus: bus,
               enhancer: enhancer,
             ),
@@ -82,19 +82,19 @@ abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
   }
 
   @override
-  ComponentContext<T> createContext(
-    Store<Object> store,
-    BuildContext buildContext,
-    Get<T> getState, {
-    @required void Function() markNeedsBuild,
-    @required DispatchBus bus,
-    @required Enhancer<Object> enhancer,
+  ComponentContext<T?> createContext(
+    Store<Object?> store,
+    BuildContext? buildContext,
+    Get<T?> getState, {
+    required void Function() markNeedsBuild,
+    required DispatchBus bus,
+    required Enhancer<Object?> enhancer,
   }) {
     assert(bus != null && enhancer != null);
-    return ComponentContext<T>(
+    return ComponentContext<T?>(
       logic: this,
       store: store,
-      buildContext: buildContext,
+      buildContext: buildContext!,
       getState: getState,
       view: enhancer.viewEnhance(protectedView, this, store),
       shouldUpdate: protectedShouldUpdate,
@@ -114,7 +114,7 @@ abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
 
   ComponentState<T> createState() => ComponentState<T>();
 
-  String get name => cache<String>('name', () => runtimeType.toString());
+  String? get name => cache<String>('name', () => runtimeType.toString());
 
   bool isPureView() {
     return protectedReducer == null &&
@@ -131,13 +131,13 @@ abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
 
   static Widget _wrapperByDefault(Widget child) => child;
 
-  static Get<T> _asGetter<T>(Get<Object> getter) {
-    Get<T> runtimeGetter;
+  static Get<T?> _asGetter<T>(Get<Object?>? getter) {
+    Get<T?> runtimeGetter;
     if (getter is Get<T>) {
       runtimeGetter = getter;
     } else {
       runtimeGetter = () {
-        final T result = getter();
+        final T? result = getter!() as T?;
         return result;
       };
     }
@@ -146,24 +146,24 @@ abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
 }
 
 class _PureViewWidget<T> extends StatelessWidget {
-  final ViewBuilder<T> viewBuilder;
-  final Get<Object> getter;
-  final DispatchBus bus;
-  final Store<Object> store;
+  final ViewBuilder<T?> viewBuilder;
+  final Get<Object?>? getter;
+  final DispatchBus? bus;
+  final Store<Object?>? store;
 
   const _PureViewWidget({
-    @required this.viewBuilder,
-    @required this.getter,
-    @required this.bus,
-    @required this.store,
+    required this.viewBuilder,
+    required this.getter,
+    required this.bus,
+    required this.store,
   });
 
   @override
   Widget build(BuildContext context) => viewBuilder(
-        getter(),
+        getter!() as T?,
         (Action action) {
-          store.dispatch(action);
-          bus.dispatch(action);
+          store!.dispatch!(action);
+          bus!.dispatch(action);
         },
         PureViewViewService(bus, context),
       );
@@ -171,18 +171,18 @@ class _PureViewWidget<T> extends StatelessWidget {
 
 class ComponentWidget<T> extends StatefulWidget {
   final Component<T> component;
-  final Store<Object> store;
+  final Store<Object?> store;
   final Get<T> getter;
-  final DispatchBus bus;
-  final Enhancer<Object> enhancer;
+  final DispatchBus? bus;
+  final Enhancer<Object?>? enhancer;
 
   const ComponentWidget({
-    @required this.component,
-    @required this.store,
-    @required this.getter,
+    required this.component,
+    required this.store,
+    required this.getter,
     this.bus,
     this.enhancer,
-    Key key,
+    Key? key,
   })  : assert(component != null),
         assert(store != null),
         assert(getter != null),
@@ -193,21 +193,21 @@ class ComponentWidget<T> extends StatefulWidget {
 }
 
 class ComponentState<T> extends State<ComponentWidget<T>> {
-  ComponentContext<T> _ctx;
+  ComponentContext<T?>? _ctx;
 
-  ComponentContext<T> get ctx => _ctx;
+  ComponentContext<T?>? get ctx => _ctx;
 
   @mustCallSuper
   @override
-  Widget build(BuildContext context) => _ctx.buildWidget();
+  Widget build(BuildContext context) => _ctx!.buildWidget();
 
   @override
   @protected
   @mustCallSuper
   void reassemble() {
     super.reassemble();
-    _ctx.clearCache();
-    _ctx.onLifecycle(LifecycleCreator.reassemble());
+    _ctx!.clearCache();
+    _ctx!.onLifecycle(LifecycleCreator.reassemble());
   }
 
   @mustCallSuper
@@ -225,14 +225,14 @@ class ComponentState<T> extends State<ComponentWidget<T>> {
           setState(() {});
         }
       },
-      bus: widget.bus,
-      enhancer: widget.enhancer,
+      bus: widget.bus!,
+      enhancer: widget.enhancer!,
     );
 
     /// register store.subscribe
-    _ctx.registerOnDisposed(widget.store.subscribe(() => _ctx.onNotify()));
+    _ctx!.registerOnDisposed(widget.store.subscribe!(() => _ctx!.onNotify()));
 
-    _ctx.onLifecycle(LifecycleCreator.initState());
+    _ctx!.onLifecycle(LifecycleCreator.initState());
   }
 
   @mustCallSuper
@@ -241,30 +241,30 @@ class ComponentState<T> extends State<ComponentWidget<T>> {
     super.didChangeDependencies();
 
     if (widget.component.protectedClearOnDependenciesChanged != false) {
-      _ctx.clearCache();
+      _ctx!.clearCache();
     }
 
-    _ctx.onLifecycle(LifecycleCreator.didChangeDependencies());
+    _ctx!.onLifecycle(LifecycleCreator.didChangeDependencies());
   }
 
   @mustCallSuper
   @override
   void deactivate() {
     super.deactivate();
-    _ctx.onLifecycle(LifecycleCreator.deactivate());
+    _ctx!.onLifecycle(LifecycleCreator.deactivate());
   }
 
   @mustCallSuper
   @override
   void didUpdateWidget(ComponentWidget<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _ctx.didUpdateWidget();
-    _ctx.onLifecycle(LifecycleCreator.didUpdateWidget());
+    _ctx!.didUpdateWidget();
+    _ctx!.onLifecycle(LifecycleCreator.didUpdateWidget());
   }
 
   @mustCallSuper
   void disposeCtx() {
-    if (!_ctx.isDisposed) {
+    if (!_ctx!.isDisposed) {
       _ctx
         ..onLifecycle(LifecycleCreator.dispose())
         ..dispose();

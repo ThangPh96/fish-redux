@@ -9,24 +9,24 @@ import 'recycle_context.dart';
 class StaticFlowAdapter<T> extends Logic<T>
     with RecycleContextMixin<T>
     implements AbstractAdapter<T> {
-  final List<Dependent<T>> _slots;
+  final List<Dependent<T>>? _slots;
 
   StaticFlowAdapter({
-    @required List<Dependent<T>> slots,
-    Reducer<T> reducer,
-    Effect<T> effect,
-    ReducerFilter<T> filter,
+    required List<Dependent<T>> slots,
+    Reducer<T>? reducer,
+    Effect<T>? effect,
+    ReducerFilter<T>? filter,
 
     /// implement [StateKey] in T instead of using key in Logic.
     /// class T implements StateKey {
     ///   Object _key = UniqueKey();
     ///   Object key() => _key;
     /// }
-    @deprecated Object Function(T) key,
+    @deprecated Object Function(T)? key,
   })  : assert(slots != null),
         _slots = Collections.compact(slots),
         super(
-          reducer: combineReducers(<Reducer<T>>[
+          reducer: combineReducers(<Reducer<T>?>[
             reducer,
             combineSubReducers(
               slots.map(
@@ -42,19 +42,19 @@ class StaticFlowAdapter<T> extends Logic<T>
         );
 
   @override
-  ListAdapter buildAdapter(ContextSys<T> ctx) {
-    final RecycleContext<T> recycleCtx = ctx;
+  ListAdapter buildAdapter(ContextSys<T>? ctx) {
+    final RecycleContext<T> recycleCtx = ctx as RecycleContext<T>;
     final List<ListAdapter> adapters = <ListAdapter>[];
 
     recycleCtx.markAllUnused();
-    for (int i = 0; i < _slots.length; i++) {
-      final Dependent<T> dependent = _slots[i];
-      final Object subObject = dependent.subGetter(recycleCtx.getState)();
+    for (int i = 0; i < _slots!.length; i++) {
+      final Dependent<T> dependent = _slots![i];
+      final Object? subObject = dependent.subGetter(recycleCtx.getState)();
       if (!dependent.isComponent()) {
         /// precondition is subObject != null
         if (subObject != null) {
           /// use index of key
-          final ContextSys<Object> subCtx = recycleCtx.reuseOrCreate(i, () {
+          final ContextSys<Object?> subCtx = recycleCtx.reuseOrCreate(i, () {
             return dependent.createContext(
               recycleCtx.store,
               recycleCtx.context,
