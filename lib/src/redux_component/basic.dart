@@ -8,9 +8,9 @@ import 'auto_dispose.dart';
 /// 2.Dispatch is used to send actions
 /// 3.ViewService is used to build sub-components or adapter.
 typedef ViewBuilder<T> = Widget Function(
-  T? state,
+  T state,
   Dispatch dispatch,
-  ViewService? viewService,
+  ViewService viewService,
 );
 
 /// Define a base ListAdapter which is used for ListView.builder.
@@ -28,7 +28,7 @@ class ListAdapter {
 typedef AdapterBuilder<T> = ListAdapter Function(
   T state,
   Dispatch dispatch,
-  ViewService? viewService,
+  ViewService viewService,
 );
 
 /// Data driven ui

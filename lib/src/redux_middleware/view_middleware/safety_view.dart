@@ -12,7 +12,7 @@ ViewMiddleware<T> safetyView<T>(
     return (ViewBuilder<dynamic> next) {
       return isDebug()
           ? next
-          : (dynamic state, Dispatch dispatch, ViewService? viewService) {
+          : (dynamic state, Dispatch dispatch, ViewService viewService) {
               try {
                 return next(state, dispatch, viewService);
               } catch (e, stackTrace) {

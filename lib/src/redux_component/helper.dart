@@ -9,7 +9,7 @@ import 'basic.dart';
 import 'lifecycle.dart';
 
 AdapterBuilder<T> asAdapter<T>(ViewBuilder<T> view) {
-  return (T unstableState, Dispatch dispatch, ViewService? service) {
+  return (T unstableState, Dispatch dispatch, ViewService service) {
     final ContextSys<T>? ctx = service as ContextSys<T>?;
     return ListAdapter(
       (BuildContext buildContext, int index) =>

@@ -14,7 +14,7 @@ AdapterMiddleware<T> safetyAdapter<T>({
     return (AdapterBuilder<dynamic> next) {
       return isDebug()
           ? next
-          : (dynamic state, Dispatch dispatch, ViewService? viewService) {
+          : (dynamic state, Dispatch dispatch, ViewService viewService) {
               try {
                 final ListAdapter result = next(state, dispatch, viewService);
                 return ListAdapter((BuildContext buildContext, int index) {

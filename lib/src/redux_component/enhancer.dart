@@ -117,10 +117,10 @@ class EnhancerDefault<T> implements Enhancer<T> {
           effect?.call(action, ctx as Context<K>);
 
   ViewBuilder<dynamic> _inverterView<K>(ViewBuilder<K> view) =>
-      (dynamic state, Dispatch dispatch, ViewService? viewService) =>
+      (dynamic state, Dispatch dispatch, ViewService viewService) =>
           view(state, dispatch, viewService);
 
   AdapterBuilder<dynamic> _inverterAdapter<K>(AdapterBuilder<K> adapter) =>
-      (dynamic state, Dispatch dispatch, ViewService? viewService) =>
+      (dynamic state, Dispatch dispatch, ViewService viewService) =>
           adapter(state, dispatch, viewService);
 }

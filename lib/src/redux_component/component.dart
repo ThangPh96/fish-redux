@@ -12,12 +12,12 @@ typedef WidgetWrapper = Widget Function(Widget child);
 
 @immutable
 abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
-  final ViewBuilder<T?> _view;
+  final ViewBuilder<T> _view;
   final ShouldUpdate<T?> _shouldUpdate;
   final WidgetWrapper _wrapper;
   final bool _clearOnDependenciesChanged;
 
-  ViewBuilder<T?> get protectedView => _view;
+  ViewBuilder<T> get protectedView => _view;
   ShouldUpdate<T?> get protectedShouldUpdate => _shouldUpdate;
   WidgetWrapper get protectedWrapper => _wrapper;
   bool get protectedClearOnDependenciesChanged => _clearOnDependenciesChanged;
@@ -59,13 +59,19 @@ abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
     required Enhancer<Object?> enhancer,
   }) {
     /// Check bus: DispatchBusDefault(); enhancer: EnhancerDefault<Object>();
-    assert(bus != null);
+    assert(bus != null &&
+        protectedView is Widget Function(
+            T?, dynamic Function(Action), ViewService));
 
     return protectedWrapper(
       isPureView()
           ? _PureViewWidget<T>(
               store: store,
-              viewBuilder: enhancer.viewEnhance(protectedView, this, store),
+              viewBuilder: enhancer.viewEnhance(
+                  protectedView as Widget Function(
+                      T?, dynamic Function(Action), ViewService),
+                  this,
+                  store),
               getter: getter,
               bus: bus,
             )
