@@ -8,7 +8,7 @@ Middleware<T> logMiddleware<T>({
   String Function(T)? monitor,
 }) {
   return ({Dispatch? dispatch, Get<T>? getState}) {
-    return (Dispatch? next) {
+    return (Dispatch next) {
       return isDebug()
           ? (Action action) {
               print('---------- [$tag] ----------');
@@ -19,7 +19,7 @@ Middleware<T> logMiddleware<T>({
                 print('[$tag] prev-state: ${monitor(prevState)}');
               }
 
-              next!(action);
+              next(action);
 
               final T nextState = getState();
               if (monitor != null) {

@@ -51,7 +51,7 @@ typedef Composable<T> = T Function(T next);
 typedef Get<R> = R Function();
 
 /// Definition of the standard Middleware.
-typedef Middleware<T> = Composable<Dispatch?> Function({
+typedef Middleware<T> = Composable<Dispatch> Function({
   Dispatch? dispatch,
   Get<T>? getState,
 });

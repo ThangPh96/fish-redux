@@ -34,14 +34,13 @@ Effect<T> mergeEffects<T extends K, K>(Effect<K> sup, [Effect<T>? sub]) {
 
 /// combine & as
 /// for action.type which override it's == operator
-Reducer<T>? asReducer<T>(Map<Object, Reducer<T>> map) => (map.isEmpty)
-    ? null
-    : (T state, Action action) =>
-        map.entries
-            .firstWhereOrNull((MapEntry<Object, Reducer<T>> entry) =>
-                action.type == entry.key)
-            ?.value(state, action) ??
-        state;
+Reducer<T> asReducer<T>(Map<Object, Reducer<T>> map) => (T state,
+        Action action) =>
+    map.entries
+        .firstWhereOrNull(
+            (MapEntry<Object, Reducer<T>> entry) => action.type == entry.key)
+        ?.value(state, action) ??
+    state;
 
 Reducer<T> filterReducer<T>(Reducer<T> reducer, ReducerFilter<T>? filter) {
   return (T state, Action action) {

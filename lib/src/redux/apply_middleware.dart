@@ -23,8 +23,8 @@ StoreEnhancer<T>? applyMiddleware<T>(List<Middleware<T>> middleware) {
                 .fold(
                   initialValue,
                   (Dispatch? previousValue,
-                          Dispatch? Function(Dispatch?) element) =>
-                      element(previousValue),
+                          Dispatch? Function(Dispatch) element) =>
+                      previousValue != null ? element(previousValue) : null,
                 );
 
             return store;
