@@ -112,10 +112,9 @@ class EnhancerDefault<T> implements Enhancer<T> {
   StoreCreator<T> storeEnhance(StoreCreator<T> creator) =>
       _storeEnhancer?.call(creator) ?? creator;
 
-  Effect<dynamic>? _inverterEffect<K>(Effect<K>? effect) => effect == null
-      ? null
-      : (Action action, Context<dynamic> ctx) =>
-          effect(action, ctx as Context<K>);
+  Effect<dynamic> _inverterEffect<K>(Effect<K>? effect) =>
+      (Action action, Context<dynamic> ctx) =>
+          effect?.call(action, ctx as Context<K>);
 
   ViewBuilder<dynamic> _inverterView<K>(ViewBuilder<K> view) =>
       (dynamic state, Dispatch dispatch, ViewService? viewService) =>

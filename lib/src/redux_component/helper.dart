@@ -141,9 +141,9 @@ EffectMiddleware<T>? mergeEffectMiddleware<T>(
   return Collections.reduce<EffectMiddleware<T>>(middleware,
       (EffectMiddleware<T> first, EffectMiddleware<T> second) {
     return (AbstractLogic<dynamic> logic, Store<T> store) {
-      final Composable<Effect<dynamic>?> inner = first(logic, store);
-      final Composable<Effect<dynamic>?> outer = second(logic, store);
-      return (Effect<dynamic>? effect) {
+      final Composable<Effect<dynamic>> inner = first(logic, store);
+      final Composable<Effect<dynamic>> outer = second(logic, store);
+      return (Effect<dynamic> effect) {
         return outer(inner(effect));
       };
     };

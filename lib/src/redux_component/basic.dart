@@ -106,7 +106,7 @@ typedef AdapterMiddleware<T> = Composable<AdapterBuilder<dynamic>> Function(
 ///     };
 ///   };
 /// }
-typedef EffectMiddleware<T> = Composable<Effect<dynamic>?> Function(
+typedef EffectMiddleware<T> = Composable<Effect<dynamic>> Function(
   AbstractLogic<dynamic>,
   Store<T>,
 );
