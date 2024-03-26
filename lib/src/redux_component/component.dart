@@ -12,21 +12,21 @@ typedef WidgetWrapper = Widget Function(Widget child);
 
 @immutable
 abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
-  final ViewBuilder<T?> _view;
+  final ViewBuilder<T> _view;
   final ShouldUpdate<T?> _shouldUpdate;
   final WidgetWrapper _wrapper;
   final bool _clearOnDependenciesChanged;
 
-  ViewBuilder<T?> get protectedView => _view;
+  ViewBuilder<T> get protectedView => _view;
   ShouldUpdate<T?> get protectedShouldUpdate => _shouldUpdate;
   WidgetWrapper get protectedWrapper => _wrapper;
   bool get protectedClearOnDependenciesChanged => _clearOnDependenciesChanged;
 
   Component({
-    required ViewBuilder<T?> view,
+    required ViewBuilder<T> view,
     Reducer<T>? reducer,
     ReducerFilter<T?>? filter,
-    Effect<T?>? effect,
+    Effect<T>? effect,
     Dependencies<T>? dependencies,
     ShouldUpdate<T?>? shouldUpdate,
     WidgetWrapper? wrapper,

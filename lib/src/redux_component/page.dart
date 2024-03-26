@@ -29,10 +29,10 @@ abstract class Page<T, P> extends Component<T> {
 
   Page({
     required InitState<T, P> initState,
-    required ViewBuilder<T?> view,
+    required ViewBuilder<T> view,
     Reducer<T>? reducer,
     ReducerFilter<T?>? filter,
-    Effect<T?>? effect,
+    Effect<T>? effect,
     Dependencies<T>? dependencies,
     ShouldUpdate<T?>? shouldUpdate,
     WidgetWrapper? wrapper,
