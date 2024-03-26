@@ -57,28 +57,26 @@ typedef SubEffect<T> = FutureOr<void> Function(Action action, Context<T> ctx);
 
 /// for action.type which override it's == operator
 /// return [UserEffecr]
-Effect<T>? combineEffects<T>(Map<Object, SubEffect<T>> map) => (map.isEmpty)
-    ? null
-    : (Action action, Context<T> ctx) {
-        final SubEffect<T>? subEffect = map.entries
-            .firstWhereOrNull(
-              (MapEntry<Object, SubEffect<T>> entry) =>
-                  action.type == entry.key,
-            )
-            ?.value;
+Effect<T> combineEffects<T>(Map<Object, SubEffect<T>> map) =>
+    (Action action, Context<T> ctx) {
+      final SubEffect<T>? subEffect = map.entries
+          .firstWhereOrNull(
+            (MapEntry<Object, SubEffect<T>> entry) => action.type == entry.key,
+          )
+          ?.value;
 
-        if (subEffect != null) {
-          return subEffect.call(action, ctx) ?? _SUB_EFFECT_RETURN_NULL;
-        }
+      if (subEffect != null) {
+        return subEffect.call(action, ctx) ?? _SUB_EFFECT_RETURN_NULL;
+      }
 
-        //skip-lifecycle-actions
-        if (action.type is Lifecycle) {
-          return _SUB_EFFECT_RETURN_NULL;
-        }
+      //skip-lifecycle-actions
+      if (action.type is Lifecycle) {
+        return _SUB_EFFECT_RETURN_NULL;
+      }
 
-        /// no subEffect
-        return null;
-      };
+      /// no subEffect
+      return null;
+    };
 
 /// return [EffectDispatch]
 Dispatch createEffectDispatch<T>(Effect<T>? userEffect, Context<T> ctx) {
