@@ -18,7 +18,7 @@ ApplyLikeEnhancer performanceAOP(String tag) {
                 print(
                     '$tag performance <Future>: ${_microSecsSinceEpoch() - marked}');
                 return r;
-              } as FutureOr<_> Function(dynamic));
+              } as FutureOr<dynamic> Function(dynamic));
             } else {
               print('$tag performance: ${_microSecsSinceEpoch() - marked}');
             }

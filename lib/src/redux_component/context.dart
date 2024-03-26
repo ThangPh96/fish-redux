@@ -6,12 +6,12 @@ import 'basic.dart';
 import 'lifecycle.dart';
 
 mixin _ExtraMixin {
-  Map<String, Object> _extra;
-  Map<String, Object> get extra => _extra;
+  Map<String, Object>? _extra;
+  Map<String, Object> get extra => _extra ?? {};
 }
 
 /// Default Context
-abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
+abstract class LogicContext<T> extends ContextSys<T> with _ExtraMixin {
   final AbstractLogic<T?> logic;
 
   @override
@@ -25,7 +25,7 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
 
   void Function()? _forceUpdate;
 
-  BuildContext? _buildContext;
+  BuildContext _buildContext;
   late Dispatch _dispatch;
   Dispatch? _effectDispatch;
 
@@ -63,7 +63,7 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
   }
 
   @override
-  BuildContext? get context => _buildContext;
+  BuildContext get context => _buildContext;
 
   @override
   T get state => getState();
@@ -90,7 +90,6 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
   @override
   void dispose() {
     super.dispose();
-    _buildContext = null;
     _forceUpdate = null;
   }
 
@@ -133,8 +132,8 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
 
   @override
   void Function() listen({
-    bool Function(T?, T)? isChanged,
-    required void Function()? onChange,
+    bool Function(T, T)? isChanged,
+    void Function()? onChange,
   }) {
     assert(onChange != null);
     T? oldState;
@@ -144,7 +143,7 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
           final T newState = state;
           final bool flag = isChanged == null
               ? !identical(oldState, newState)
-              : isChanged(oldState, newState);
+              : (oldState == null ? true : isChanged(oldState!, newState));
           oldState = newState;
           if (flag) {
             onChange!();
@@ -158,10 +157,10 @@ abstract class LogicContext<T> extends ContextSys<T?> with _ExtraMixin {
 }
 
 class ComponentContext<T> extends LogicContext<T> implements ViewUpdater<T> {
-  final ViewBuilder<T> view;
+  final ViewBuilder<T>? view;
   final ShouldUpdate<T?> shouldUpdate;
   final String? name;
-  final Function() markNeedsBuild;
+  final Function()? markNeedsBuild;
   final ContextSys<Object?>? sidecarCtx;
 
   Widget? _widgetCache;
@@ -209,7 +208,8 @@ class ComponentContext<T> extends LogicContext<T> implements ViewUpdater<T> {
   Widget buildWidget() {
     Widget? result = _widgetCache;
     if (result == null) {
-      result = _widgetCache = view(state, dispatch, this);
+      result = _widgetCache =
+          view == null ? const SizedBox.shrink() : view!(state, dispatch, this);
 
       dispatch(LifecycleCreator.build(name));
     }
@@ -231,7 +231,7 @@ class ComponentContext<T> extends LogicContext<T> implements ViewUpdater<T> {
     if (shouldUpdate(_latestState, now)) {
       _widgetCache = null;
 
-      markNeedsBuild();
+      markNeedsBuild?.call();
 
       _latestState = now;
     }
@@ -247,7 +247,7 @@ class ComponentContext<T> extends LogicContext<T> implements ViewUpdater<T> {
     _widgetCache = null;
 
     try {
-      markNeedsBuild();
+      markNeedsBuild?.call();
     } catch (e) {
       /// should try-catch in force mode which is called from outside
     }

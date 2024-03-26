@@ -11,7 +11,7 @@ class RecycleContext<T> extends AdapterContext<T> {
 
   RecycleContext({
     required AbstractAdapter<T> logic,
-    @required required Store<Object> store,
+    required Store<Object?> store,
     required BuildContext buildContext,
     required Get<T> getState,
     required DispatchBus bus,
@@ -74,20 +74,20 @@ class RecycleContext<T> extends AdapterContext<T> {
 
 mixin RecycleContextMixin<T> implements AbstractAdapter<T> {
   @override
-  RecycleContext<T> createContext(
-    Store<Object> store,
-    BuildContext buildContext,
-    Get<T> getState, {
-    required DispatchBus bus,
-    required Enhancer<Object> enhancer,
-  }) {
+  ContextSys<T> createContext(
+      Store<Object?> store, BuildContext buildContext, Get getState,
+      {required DispatchBus? bus, required Enhancer<Object?>? enhancer}) {
+    assert(bus != null &&
+        enhancer == null &&
+        getState is T Function() &&
+        enhancer is Enhancer<Object>);
     return RecycleContext<T>(
       logic: this,
       store: store,
       buildContext: buildContext,
-      getState: getState,
-      bus: bus,
-      enhancer: enhancer,
+      getState: getState as T Function(),
+      bus: bus!,
+      enhancer: enhancer as Enhancer<Object>,
     );
   }
 }

@@ -49,7 +49,7 @@ class Collections {
   /// print(list)                       // [1, 2, null, 3, null]
   /// print(Collections.compact(list)); // [1, 2, 3]
   static List<T>? compact<T>(Iterable<T>? list, {bool growable = true}) =>
-      list?.whereNotNull().toList(growable: growable);
+      list?.where((element) => element != null).toList(growable: growable);
 
   /// Check if an Object is Empty.
   static bool isEmpty(Object value) {

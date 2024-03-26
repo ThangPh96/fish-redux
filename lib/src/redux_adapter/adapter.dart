@@ -4,14 +4,14 @@ import '../redux/redux.dart';
 import '../redux_component/redux_component.dart';
 
 /// abstract for custom extends
-abstract class Adapter<T> extends Logic<T?> implements AbstractAdapter<T> {
+abstract class Adapter<T> extends Logic<T> implements AbstractAdapter<T> {
   final AdapterBuilder<T> _adapter;
 
   AdapterBuilder<T> get protectedAdapter => _adapter;
 
   Adapter({
     required AdapterBuilder<T> adapter,
-    Reducer<T?>? reducer,
+    Reducer<T>? reducer,
     ReducerFilter<T?>? filter,
     Effect<T?>? effect,
     Dependencies<T>? dependencies,
@@ -34,20 +34,17 @@ abstract class Adapter<T> extends Logic<T?> implements AbstractAdapter<T> {
       .call(ctx.state, ctx.dispatch, ctx);
 
   @override
-  ContextSys<T?> createContext(
-    Store<Object?> store,
-    BuildContext? buildContext,
-    Get<T?> getState, {
-    required Enhancer<Object?> enhancer,
-    required DispatchBus bus,
-  }) {
-    return AdapterContext<T?>(
+  ContextSys<T> createContext(
+      Store<Object?> store, BuildContext buildContext, Get<T> getState,
+      {required DispatchBus? bus, required Enhancer<Object?>? enhancer}) {
+    assert(bus != null && enhancer != null);
+    return AdapterContext<T>(
       logic: this,
       store: store,
-      buildContext: buildContext!,
+      buildContext: buildContext,
       getState: getState,
-      bus: bus,
-      enhancer: enhancer,
+      bus: bus!,
+      enhancer: enhancer!,
     );
   }
 }

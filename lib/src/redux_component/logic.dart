@@ -71,14 +71,16 @@ abstract class Logic<T> implements AbstractLogic<T> {
       : (_resultCache[key] = getter());
 
   @override
-  Reducer<T>? get reducer => helper.filterReducer(
+  Reducer<T> get reducer => helper.filterReducer(
       combineReducers<T>(
-          <Reducer<T>?>[protectedReducer, protectedDependencies?.reducer]),
+              <Reducer<T>?>[protectedReducer, protectedDependencies?.reducer])
+          as T Function(T, Action),
       protectedFilter);
 
   @override
   Object onReducer(Object state, Action action) =>
-      cache<Reducer<T>?>('onReducer', () => reducer)?.call(state as T, action) ??
+      cache<Reducer<T>?>('onReducer', () => reducer)
+          ?.call(state as T, action) ??
       state;
 
   @override

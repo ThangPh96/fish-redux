@@ -15,7 +15,7 @@ ApplyLikeEnhancer logAOP(String tag) {
               result.then((Object r) {
                 print('$tag output <Future>: $r');
                 return r;
-              } as FutureOr<_> Function(dynamic));
+              } as FutureOr<dynamic> Function(dynamic));
             } else {
               print('$tag output: $result');
             }

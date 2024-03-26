@@ -36,7 +36,7 @@ class _Dependent<T, P> implements Dependent<T> {
   }
 
   @override
-  ListAdapter buildAdapter(covariant ContextSys<P?>? ctx) {
+  ListAdapter buildAdapter(covariant ContextSys<P?> ctx) {
     assert(isAdapter(), 'Unexpected type of ${logic.runtimeType}.');
     final AbstractAdapter<P?> adapter = logic as AbstractAdapter<P?>;
     return adapter.buildAdapter(ctx);
@@ -46,27 +46,23 @@ class _Dependent<T, P> implements Dependent<T> {
   Get<P> subGetter(Get<T> getter) => () => connector.get(getter());
 
   @override
-  ContextSys<P> createContext(
-    Store<Object?> store,
-    BuildContext? buildContext,
-    Get<T> getState, {
-    required DispatchBus bus,
-    required Enhancer<Object?> enhancer,
-  }) {
+  bool isComponent() => logic is AbstractComponent;
+
+  @override
+  bool isAdapter() => logic is AbstractAdapter;
+
+  @override
+  ContextSys<Object> createContext(
+      Store<Object?> store, BuildContext buildContext, Get<T> getState,
+      {DispatchBus? bus, Enhancer<Object?>? enhancer}) {
     return logic.createContext(
       store,
       buildContext,
       subGetter(getState),
       bus: bus,
       enhancer: enhancer,
-    );
+    ) as ContextSys<Object>;
   }
-
-  @override
-  bool isComponent() => logic is AbstractComponent;
-
-  @override
-  bool isAdapter() => logic is AbstractAdapter;
 }
 
 Dependent<K> createDependent<K, T>(

@@ -22,15 +22,15 @@ abstract class Page<T, P> extends Component<T> {
 
   final InitState<T, P> _initState;
 
-  final Enhancer<T?> enhancer;
+  final Enhancer<T> enhancer;
 
   /// connect with other stores
-  final List<StoreUpdater<T?>> _storeUpdaters = <StoreUpdater<T?>>[];
+  final List<StoreUpdater<T>> _storeUpdaters = <StoreUpdater<T>>[];
 
   Page({
     required InitState<T, P> initState,
     required ViewBuilder<T?> view,
-    Reducer<T?>? reducer,
+    Reducer<T>? reducer,
     ReducerFilter<T?>? filter,
     Effect<T?>? effect,
     Dependencies<T>? dependencies,
@@ -71,15 +71,15 @@ abstract class Page<T, P> extends Component<T> {
         param: param,
       ));
 
-  Store<T?> createStore(P param) => updateStore(createBatchStore<T>(
+  Store<T> createStore(P param) => updateStore(createBatchStore<T>(
         _initState(param),
         reducer,
         storeEnhancer: enhancer.storeEnhance,
       ));
 
-  Store<T?> updateStore(Store<T?> store) => _storeUpdaters.fold(
+  Store<T> updateStore(Store<T> store) => _storeUpdaters.fold(
         store,
-        (Store<T?> previousValue, StoreUpdater<T?> element) =>
+        (Store<T> previousValue, StoreUpdater<T> element) =>
             element(previousValue),
       );
 
@@ -94,7 +94,7 @@ abstract class Page<T, P> extends Component<T> {
             store,
             extraStore,
             update,
-          ) as Store<T?>);
+          ) as Store<T>);
 
   DispatchBus createPageBus() => DispatchBusDefault();
 

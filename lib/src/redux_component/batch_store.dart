@@ -10,7 +10,7 @@ mixin _BatchNotify<T> on Store<T> {
   final List<void Function()> _listeners = <void Function()>[];
   bool _isBatching = false;
   bool _isSetupBatch = false;
-  T _prevState;
+  T? _prevState;
 
   void setupBatch() {
     if (!_isSetupBatch) {
@@ -74,12 +74,12 @@ class _BatchStore<T> extends Store<T> with _BatchNotify<T> {
   }
 }
 
-Store<T?> createBatchStore<T>(
+Store<T> createBatchStore<T>(
   T preloadedState,
-  Reducer<T?>? reducer, {
-  StoreEnhancer<T?>? storeEnhancer,
+  Reducer<T> reducer, {
+  StoreEnhancer<T>? storeEnhancer,
 }) =>
-    _BatchStore<T?>(
+    _BatchStore<T>(
       createStore(
         preloadedState,
         _appendUpdateStateReducer<T>(reducer),
@@ -92,10 +92,10 @@ Store<T?> createBatchStore<T>(
 enum _UpdateState { Assign }
 
 // replace current state
-Reducer<T?> _appendUpdateStateReducer<T>(Reducer<T?>? reducer) =>
+Reducer<T> _appendUpdateStateReducer<T>(Reducer<T>? reducer) =>
     (T? state, Action action) => action.type == _UpdateState.Assign
         ? action.payload
-        : reducer == null
+        : (reducer == null || state == null)
             ? state
             : reducer(state, action);
 

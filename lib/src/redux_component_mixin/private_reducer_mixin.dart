@@ -22,7 +22,7 @@ mixin PrivateReducerMixin<T> on Logic<T> {
   }
 
   @override
-  Dispatch createDispatch(Dispatch effect, Dispatch next, Context<T> ctx) {
+  Dispatch createDispatch(Dispatch? effect, Dispatch next, Context<T> ctx) {
     final Dispatch superDispatch = super.createDispatch(effect, next, ctx);
     return (Action action) {
       if (action.type is! Lifecycle && action is! PrivateAction) {

@@ -255,12 +255,12 @@ abstract class Dependent<T> {
   /// P state
   ListAdapter buildAdapter(ContextSys<Object?>? ctx);
 
-  ContextSys<Object?> createContext(
+  ContextSys<Object> createContext(
     Store<Object?> store,
-    BuildContext? buildContext,
+    BuildContext buildContext,
     Get<T> getState, {
-    required DispatchBus bus,
-    required Enhancer<Object?> enhancer,
+    DispatchBus bus,
+    Enhancer<Object?> enhancer,
   });
 
   bool isComponent();
@@ -294,10 +294,10 @@ abstract class AbstractLogic<T> {
   /// To create each instance's context
   ContextSys<T> createContext(
     Store<Object?> store,
-    BuildContext? buildContext,
+    BuildContext buildContext,
     Get<T> getState, {
-    required DispatchBus bus,
-    required Enhancer<Object?> enhancer,
+    required DispatchBus? bus,
+    required Enhancer<Object?>? enhancer,
   });
 
   /// To create each instance's key (for recycle) if needed
@@ -323,7 +323,7 @@ abstract class AbstractComponent<T> implements AbstractLogic<T> {
 }
 
 abstract class AbstractAdapter<T> implements AbstractLogic<T> {
-  ListAdapter buildAdapter(ContextSys<T>? ctx);
+  ListAdapter buildAdapter(ContextSys<T> ctx);
 }
 
 /// Because a main reducer will be very complicated with multiple level's state.

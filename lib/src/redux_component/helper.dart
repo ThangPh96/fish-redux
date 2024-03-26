@@ -43,12 +43,12 @@ Reducer<T>? asReducer<T>(Map<Object, Reducer<T>> map) => (map.isEmpty)
             ?.value(state, action) ??
         state;
 
-Reducer<T>? filterReducer<T>(Reducer<T>? reducer, ReducerFilter<T>? filter) {
-  return (reducer == null || filter == null)
-      ? reducer
-      : (T state, Action action) {
-          return filter(state, action) ? reducer(state, action) : state;
-        };
+Reducer<T> filterReducer<T>(Reducer<T> reducer, ReducerFilter<T>? filter) {
+  return (T state, Action action) {
+    return (filter?.call(state, action) ?? false)
+        ? reducer(state, action)
+        : state;
+  };
 }
 
 const Object _SUB_EFFECT_RETURN_NULL = Object();

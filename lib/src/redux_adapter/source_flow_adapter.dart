@@ -75,7 +75,7 @@ class SourceFlowAdapter<T extends AdapterSource> extends Logic<T>
       final String type = adapterSource.getItemType(index);
       final AbstractLogic<Object> result = pool[type]!;
 
-      if (result is AbstractAdapter<Object?>) {
+      if (result is AbstractAdapter<Object>) {
         final ContextSys<Object?> subCtx = recycleCtx.reuseOrCreate(
           Tuple2<Type, Object>(
             result.runtimeType,
@@ -89,7 +89,9 @@ class SourceFlowAdapter<T extends AdapterSource> extends Logic<T>
             enhancer: recycleCtx.enhancer,
           ),
         );
-        adapters.add(result.buildAdapter(subCtx));
+        if (subCtx is ContextSys<Object>) {
+          adapters.add(result.buildAdapter(subCtx));
+        }
       } else if (result is AbstractComponent<Object>) {
         adapters.add(ListAdapter((BuildContext buildContext, int _) {
           return result.buildComponent(

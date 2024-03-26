@@ -11,7 +11,7 @@ import 'logic.dart';
 typedef WidgetWrapper = Widget Function(Widget child);
 
 @immutable
-abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
+abstract class Component<T> extends Logic<T> implements AbstractComponent<T> {
   final ViewBuilder<T?> _view;
   final ShouldUpdate<T?> _shouldUpdate;
   final WidgetWrapper _wrapper;
@@ -24,7 +24,7 @@ abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
 
   Component({
     required ViewBuilder<T?> view,
-    Reducer<T?>? reducer,
+    Reducer<T>? reducer,
     ReducerFilter<T?>? filter,
     Effect<T?>? effect,
     Dependencies<T>? dependencies,
@@ -73,7 +73,7 @@ abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
               component: this,
               getter: _asGetter<T>(getter),
               store: store!,
-              key: key(getter!() as T*) as Key?,
+              key: key(getter!() as T) as Key?,
               bus: bus,
               enhancer: enhancer,
             ),
@@ -81,20 +81,21 @@ abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
   }
 
   @override
-  ComponentContext<T?> createContext(
+  ComponentContext<T> createContext(
     Store<Object?> store,
     BuildContext? buildContext,
-    Get<T?> getState, {
-    required void Function() markNeedsBuild,
-    required DispatchBus bus,
-    required Enhancer<Object?> enhancer,
+    Get<T> getState, {
+    void Function()? markNeedsBuild,
+    DispatchBus? bus,
+    Enhancer<Object?>? enhancer,
   }) {
-    return ComponentContext<T?>(
+    assert(bus != null && enhancer != null);
+    return ComponentContext<T>(
       logic: this,
       store: store,
       buildContext: buildContext!,
       getState: getState,
-      view: enhancer.viewEnhance(protectedView, this, store),
+      view: enhancer?.viewEnhance(protectedView, this, store),
       shouldUpdate: protectedShouldUpdate,
       name: name,
       markNeedsBuild: markNeedsBuild,
@@ -102,11 +103,11 @@ abstract class Component<T> extends Logic<T?> implements AbstractComponent<T> {
         store,
         buildContext,
         getState,
-        bus: bus,
-        enhancer: enhancer,
+        bus: bus!,
+        enhancer: enhancer!,
       ),
-      enhancer: enhancer,
-      bus: bus,
+      enhancer: enhancer!,
+      bus: bus!,
     );
   }
 
@@ -181,7 +182,7 @@ class ComponentWidget<T> extends StatefulWidget {
     this.bus,
     this.enhancer,
     Key? key,
-  })  : super(key: key);
+  }) : super(key: key);
 
   @override
   ComponentState<T> createState() => component.createState();
@@ -260,7 +261,7 @@ class ComponentState<T> extends State<ComponentWidget<T>> {
   @mustCallSuper
   void disposeCtx() {
     if (!_ctx!.isDisposed) {
-      _ctx
+      _ctx!
         ..onLifecycle(LifecycleCreator.dispose())
         ..dispose();
     }

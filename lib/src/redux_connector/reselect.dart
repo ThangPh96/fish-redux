@@ -28,7 +28,7 @@ bool _listEquals(List<dynamic> list1, List<dynamic>? list2) {
   return true;
 }
 
-abstract class _BasicReselect<T, P> extends MutableConn<T, P?>
+abstract class _BasicReselect<T, P> extends MutableConn<T, P>
     with ConnOpMixin<T, P> {
   List<dynamic>? _subsCache;
   P? _pCache;
@@ -39,14 +39,14 @@ abstract class _BasicReselect<T, P> extends MutableConn<T, P?>
   P reduceSubs(List<dynamic>? list);
 
   @override
-  P? get(T? state) {
+  P get(T state) {
     final List<dynamic> subs = getSubs(state);
     if (!_hasBeenCalled || !_listEquals(subs, _subsCache)) {
       _subsCache = subs;
       _pCache = reduceSubs(_subsCache);
       _hasBeenCalled = true;
     }
-    return _pCache;
+    return _pCache ?? reduceSubs(null);
   }
 }
 
@@ -164,11 +164,11 @@ abstract class Reselect<T, P> extends _BasicReselect<T, P?> {
 
 /// issue [https://github.com/alibaba/fish-redux/issues/482]
 mixin ReselectMixin<T, P> on MutableConn<T, P> {
-  List<dynamic> _cachedFactors;
-  P _cachedResult;
+  List<dynamic>? _cachedFactors;
+  P? _cachedResult;
   bool _hasBeenCalled = false;
 
-  P computed(T state);
+  P computed(T? state);
 
   List<dynamic> factors(T state) => <dynamic>[state];
 
@@ -181,6 +181,6 @@ mixin ReselectMixin<T, P> on MutableConn<T, P> {
       _cachedResult = computed(state);
       _hasBeenCalled = true;
     }
-    return _cachedResult;
+    return _cachedResult ?? computed(null);
   }
 }

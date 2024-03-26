@@ -58,7 +58,7 @@ class DynamicFlowAdapter<T> extends Logic<T> with RecycleContextMixin<T> {
       final ItemBean itemBean = list[index];
       final String type = itemBean.type;
       final AbstractLogic<Object> result = pool[type]!;
-      if (result is AbstractAdapter<Object?>) {
+      if (result is AbstractAdapter<Object>) {
         final ContextSys<Object?> subCtx = recycleCtx.reuseOrCreate(
           Tuple2<Type, Object>(
             result.runtimeType,
@@ -72,7 +72,9 @@ class DynamicFlowAdapter<T> extends Logic<T> with RecycleContextMixin<T> {
             enhancer: recycleCtx.enhancer,
           ),
         );
-        adapters.add(result.buildAdapter(subCtx));
+        if (subCtx is ContextSys<Object>) {
+          adapters.add(result.buildAdapter(subCtx));
+        }
       } else if (result is AbstractComponent<Object>) {
         adapters.add(ListAdapter((BuildContext buildContext, int _) {
           return result.buildComponent(
